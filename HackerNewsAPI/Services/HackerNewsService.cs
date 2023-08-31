@@ -1,4 +1,5 @@
-﻿using HackerNewsAPI.ExternalApi;
+﻿using System.Collections.Concurrent;
+using HackerNewsAPI.ExternalApi;
 using HackerNewsAPI.Models;
 
 namespace HackerNewsAPI.Services
@@ -18,16 +19,16 @@ namespace HackerNewsAPI.Services
             if (bestStoriesIds == null)
                 return new GetBestStoriesResponse(errorMessage: "Error while retrieving best stories.");
 
-            var bestStories = new List<Story>(numberOfStories);
-            foreach (var id in bestStoriesIds.Take(numberOfStories))
+            var bestStories = new ConcurrentBag<Story>();
+            await Parallel.ForEachAsync(bestStoriesIds.Take(numberOfStories), cancellationToken, async (id, ct) =>
             {
                 var item = await _hackerNewsApiClient.GetItemAsync(id, cancellationToken);
-                if (item == null)
-                    return new GetBestStoriesResponse(errorMessage: $"Could not read Item with ID {id}.");
-
-                var story = MapHackerNewsItemToStory(item);
-                bestStories.Add(story);
-            }
+                if (item != null)
+                {
+                    var story = MapHackerNewsItemToStory(item);
+                    bestStories.Add(story);
+                }                  
+            });
 
             var orderedBestStories = bestStories.OrderByDescending(x => x.Score).ToList();
 
@@ -44,6 +45,5 @@ namespace HackerNewsAPI.Services
                 Score: item.Score,
                 CommentCount: item.Descendants);
         }
-
     }
 }
