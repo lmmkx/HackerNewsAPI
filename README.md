@@ -17,7 +17,7 @@ Run following command from the terminal:
 ## Assumptions
 Application will be running only in one instance. The implemented approach for cache is not ideal for situation, where app is hosted on multiple servers. 
 
-The HackerNews\' endpoint '/v0/beststories' returns IDs of stories already sorted by score in descending order. This assumption allows the service to limit number of requests (for getting item/story details) only to the _N "best stories"_, as requested in 'numberOfItems' parameter of implemented service (instead of getting details for all IDs returned by '/v0/beststories' endpoint).
+The HackerNews\' endpoint '/v0/beststories' returns IDs of stories already sorted by score in descending order. This assumption allows the service to limit number of requests (for getting item/story details) only to the _N "best stories"_, as requested in 'numberOfStories' parameter of implemented service (instead of getting details for all IDs returned by '/v0/beststories' endpoint).
 
 ## Potential enhancements or changes
 
